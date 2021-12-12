@@ -302,6 +302,17 @@ plt.semilogx(alpha_vector_lasso,scores,'-o')
 plt.xlabel('alpha',fontsize=16)
 plt.ylabel('5-Fold MSE')
 
+alpha_vector_lasso = np.logspace(-3,-2,50)  # hacemos zoom
+param_grid_lasso = {'alpha': alpha_vector_lasso}
+grid_lasso = GridSearchCV(Lasso(), scoring= 'neg_mean_squared_error', param_grid=param_grid_lasso, cv = 5)
+grid_lasso.fit(XtrainScaled, np.log10(Y_train))
+print("best mean cross-validation score: {:.3f}".format(grid_lasso.best_score_))
+print("best parameters: {}".format(grid_lasso.best_params_))
+scores = -1*np.array(grid_lasso.cv_results_['mean_test_score'])
+plt.semilogx(alpha_vector_lasso,scores,'-o')
+plt.xlabel('alpha',fontsize=16)
+plt.ylabel('5-Fold MSE')
+
 alpha_optimo_lasso = grid_lasso.best_params_['alpha']
 lasso = Lasso(alpha = alpha_optimo_lasso).fit(XtrainScaled,np.log10(Y_train))
 ytrainLasso = lasso.predict(XtrainScaled)
@@ -319,7 +330,18 @@ for f,wi in zip(feature_names,w_lasso):
 
 #%% Ahora vamos a emplear el modelo de Ridge regression
 
-alpha_vector_ridge = np.logspace(-2,10,50)
+alpha_vector_ridge = np.logspace(1,7,50)
+param_grid_ridge = {'alpha': alpha_vector_ridge}
+grid_ridge = GridSearchCV(Ridge(), param_grid=param_grid_ridge, cv = 5)
+grid_ridge.fit(XtrainScaled, np.log10(Y_train))
+print("best mean cross-validation score: {:.3f}".format(grid_ridge.best_score_))
+print("best parameters: {}".format(grid_ridge.best_params_))
+scores = np.array(grid_ridge.cv_results_['mean_test_score'])
+plt.semilogx(alpha_vector_ridge,scores,'-o')
+plt.xlabel('alpha',fontsize=16)
+plt.ylabel('5-Fold MSE')
+
+alpha_vector_ridge = np.logspace(1,3,50) # hacemos zoom
 param_grid_ridge = {'alpha': alpha_vector_ridge}
 grid_ridge = GridSearchCV(Ridge(), param_grid=param_grid_ridge, cv = 5)
 grid_ridge.fit(XtrainScaled, np.log10(Y_train))
